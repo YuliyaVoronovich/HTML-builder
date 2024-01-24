@@ -15,7 +15,6 @@ const templateHtml = path.resolve(__dirname, 'template.html');
 
 async function createDistPath() {
   try {
-    //  await deleteFolder();
     await checkDirectory();
     await copyFiles();
     await createStyles();
@@ -114,11 +113,14 @@ async function createHtml() {
 
     await fsPromises.readFile(templateHtml, 'utf-8').then(async (text) => {
       for (let file of files) {
-        const name = path.parse(file.name).name;
-        const componentsFile = path.join(componentsFolder, file.name);
-        const component = await fsPromises.readFile(componentsFile, 'utf-8');
-        text = text.replaceAll(`{{${name}}}`, component);
-        await writeHtml(text);
+        const fileExt = path.parse(file.name).ext.slice(1);
+        if (fileExt === 'html') {
+          const name = path.parse(file.name).name;
+          const componentsFile = path.join(componentsFolder, file.name);
+          const component = await fsPromises.readFile(componentsFile, 'utf-8');
+          text = text.replaceAll(`{{${name}}}`, component);
+          await writeHtml(text);
+        }
       }
     });
   } catch (error) {
